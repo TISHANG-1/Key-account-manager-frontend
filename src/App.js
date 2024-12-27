@@ -2,7 +2,7 @@ import logo from "./logo.svg";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./component/Header";
-import LoginPage from "./component/LoginSignUp/Login";
+import LoginSignUp from "./component/LoginSignUp";
 import { useAuth } from "./context/auth";
 import NavigationBar from "./component/NavigationBar";
 import LeadsPage from "./component/Leads";
@@ -24,7 +24,7 @@ function App() {
         )}
         <Routes>
           {!localStorage.getItem("token") ? (
-            <Route path="/" Component={LoginPage} />
+            <Route path="/" Component={LoginSignUp} />
           ) : (
             <></>
           )}

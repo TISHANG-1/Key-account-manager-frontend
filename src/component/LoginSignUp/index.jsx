@@ -1,13 +1,13 @@
 import React from "react";
 import { Button, Checkbox, Form, Input } from "antd";
 import { PageContainer, FormContainer, Heading } from "./styles.jsx";
-import { useAuth } from "../../../context/auth.jsx";
+import { useAuth } from "../../context/auth.jsx";
 import axios from "axios";
-import { ROOT_URL } from "../../../utils.jsx";
+import { ROOT_URL } from "../../utils.jsx";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const LoginPage = () => {
+const LoginSignUp = () => {
   const { login, onLoginPage } = useAuth();
   const navigate = useNavigate();
   const onFinish = async (values) => {
@@ -17,6 +17,7 @@ const LoginPage = () => {
       })
       .then(({ data }) => {
         localStorage.setItem("token", `Bearer ${data?.token}`);
+        localStorage.setItem("role", `${data?.role}`);
         login();
         toast.success("login successful", {
           toastId: "success1",
@@ -96,4 +97,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default LoginSignUp;

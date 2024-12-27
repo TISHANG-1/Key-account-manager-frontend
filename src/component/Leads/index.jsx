@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Modal, Form, Input, Select, notification } from "antd";
+import { Table, Button, Modal, Form, Input, Select, Switch } from "antd";
 import axios from "axios";
 import { ROOT_URL } from "../../utils";
 import { toast } from "react-toastify";
@@ -14,6 +14,7 @@ const LeadsPage = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentLead, setCurrentLead] = useState(null);
   const [form] = Form.useForm();
+  const [showLeads, setShowLeads] = useState(false);
 
   const fetchUsers = async () => {
     await axios
@@ -24,14 +25,30 @@ const LeadsPage = () => {
       })
       .then(({ data }) => {
         setUsers(data);
-        // toast.success("users fetched successfully");
       })
       .catch((err) => {
         console.log(err);
         toast.error(err);
       });
   };
+
   const fetchAllLeads = async () => {
+    axios
+      .get(`${ROOT_URL}/leads/all`, {
+        headers: {
+          Authorization: localStorage.getItem("token"),
+        },
+      })
+      .then(({ data }) => {
+        setLeads(data);
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error(err);
+      });
+  };
+
+  const fetchMyAllLeads = async () => {
     axios
       .get(`${ROOT_URL}/leads`, {
         headers: {
@@ -40,13 +57,13 @@ const LeadsPage = () => {
       })
       .then(({ data }) => {
         setLeads(data);
-        // toast.success("leads fetched successfully");
       })
       .catch((err) => {
         console.log(err);
         toast.error(err);
       });
   };
+
   const showModal = (lead = null) => {
     setCurrentLead(lead);
     form.resetFields();
@@ -72,35 +89,28 @@ const LeadsPage = () => {
               }
             )
             .then(() => {
-              toast.success("lead Updated successfully", {
-                toastId: "success1",
-              });
-              fetchAllLeads();
+              toast.success("Lead updated successfully");
             })
             .catch((err) => {
               toast.error(err.message);
             });
         } else {
-          // Add new lead
           await axios
             .post(
               `${ROOT_URL}/leads/create`,
-
               { leadDetails: { ...values } },
               {
                 headers: { Authorization: localStorage.getItem("token") },
               }
             )
             .then(() => {
-              toast.success("lead created successfully", {
-                toastId: "success1",
-              });
-              fetchAllLeads();
+              toast.success("Lead created successfully");
             })
             .catch((err) => {
               toast.error(err);
             });
         }
+        showLeads ? fetchAllLeads() : fetchMyAllLeads();
         setIsModalVisible(false);
         form.resetFields();
       })
@@ -119,10 +129,8 @@ const LeadsPage = () => {
         headers: { Authorization: localStorage.getItem("token") },
       })
       .then(() => {
-        toast.success("Lead Deleted Successfully", {
-          toastId: "success1",
-        });
-        fetchAllLeads();
+        toast.success("Lead deleted successfully");
+        showLeads ? fetchAllLeads() : fetchMyAllLeads();
       })
       .catch(() => {
         toast.error("Error while deleting the lead");
@@ -175,6 +183,7 @@ const LeadsPage = () => {
             }
             type="primary"
             style={{ marginRight: 8 }}
+            disabled={showLeads}
           >
             Details
           </Button>
@@ -187,19 +196,38 @@ const LeadsPage = () => {
   ];
 
   useEffect(() => {
-    fetchAllLeads();
+    fetchMyAllLeads();
     fetchUsers();
   }, []);
 
+  useEffect(() => {
+    showLeads ? fetchAllLeads() : fetchMyAllLeads();
+  }, [showLeads]);
+
   return (
     <div style={{ margin: "40px 20px" }}>
-      <Button
-        type="primary"
-        onClick={() => showModal()}
-        style={{ marginBottom: 16 }}
-      >
-        Add New Lead
-      </Button>
+      <div style={{ marginBottom: 16, display: "flex", alignItems: "center" }}>
+        <Button
+          type="primary"
+          onClick={() => showModal()}
+          style={{ marginRight: 16 }}
+        >
+          Add New Lead
+        </Button>
+        <div>
+          {localStorage.getItem("role") === "admin" ? (
+            <div>
+              <span style={{ marginRight: 8 }}>Show Other's Leads:</span>
+              <Switch
+                checked={showLeads}
+                onChange={(checked) => setShowLeads(checked)}
+              />
+            </div>
+          ) : (
+            <></>
+          )}
+        </div>
+      </div>
       <Table columns={columns} dataSource={leads} rowKey="id" />
       <Modal
         title={currentLead ? "Update Lead" : "Add New Lead"}
@@ -246,9 +274,7 @@ const LeadsPage = () => {
                 <Option value="Lost">Lost</Option>
               </Select>
             </Form.Item>
-          ) : (
-            <></>
-          )}
+          ) : null}
           <Form.Item
             name="address"
             label="Address"
@@ -266,9 +292,7 @@ const LeadsPage = () => {
           <Form.Item
             name="assigned_to"
             label="Assigned To"
-            rules={[
-              { required: false, message: "Please input the assigned person!" },
-            ]}
+            rules={[{ required: false }]}
           >
             <Select>
               {users.map((user) => (

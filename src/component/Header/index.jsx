@@ -16,6 +16,7 @@ const Header = () => {
   const { isLoggedIn, logout, onlogin, onSignUp } = useAuth();
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("role");
     logout();
     navigate("/");
   };

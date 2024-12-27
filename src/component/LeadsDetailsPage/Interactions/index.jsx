@@ -107,11 +107,6 @@ const InteractionPage = ({ leadId }) => {
 
   const columns = [
     {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
-    },
-    {
       title: "Contact ID",
       dataIndex: "contact_id",
       key: "contact_id",
@@ -130,6 +125,11 @@ const InteractionPage = ({ leadId }) => {
       title: "Date",
       dataIndex: "date",
       key: "date",
+    },
+    {
+      title: "Details",
+      dataIndex: "details",
+      key: "details",
     },
     {
       title: "Action",
@@ -217,6 +217,14 @@ const InteractionPage = ({ leadId }) => {
           ) : (
             <></>
           )}
+
+          <Form.Item
+            label="Details"
+            name="details"
+            rules={[{ required: false, message: "Please input the details!" }]}
+          >
+            <Input />
+          </Form.Item>
 
           <Form.Item
             label="Date"
