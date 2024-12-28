@@ -351,7 +351,7 @@ const CallScheduleComponent = ({ leadId = "" }) => {
           {!leadId.length ? (
             <Form.Item
               name="restaurant_id"
-              label="Restaurant ID"
+              label="Restaurant"
               rules={[
                 { required: true, message: "Please input the restaurant ID!" },
               ]}
@@ -360,7 +360,7 @@ const CallScheduleComponent = ({ leadId = "" }) => {
                 {leads.map((lead) => (
                   <Option value={lead.id} key={lead.id}>
                     {" "}
-                    {lead.name}{" "}
+                    {lead.name} {`(${lead.id})`}
                   </Option>
                 ))}
               </Select>
